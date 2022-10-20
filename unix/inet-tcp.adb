@@ -4,7 +4,7 @@
 --                                                                          --
 -- ------------------------------------------------------------------------ --
 --                                                                          --
---  Copyright (C) 2020, ANNEXI-STRAYLINE Trans-Human Ltd.                   --
+--  Copyright (C) 2020-2022 ANNEXI-STRAYLINE Trans-Human Ltd.               --
 --  All rights reserved.                                                    --
 --                                                                          --
 --  Original Contributors:                                                  --
@@ -705,11 +705,22 @@ package body INET.TCP is
    
    ----------------------------------------------------------------------
    
-   function Dequeue (Listener: in out TCP_Listener) return TCP_Connection'Class
-   is begin
+   -- GNAT Bug work-around --
+   -- GNAT doesn't handle extended returns of class-wide types very well.
+   -- We need an intermediate function that returns the specific type,
+   -- and then return that result.
+   
+   function Intermediate_Dequeue (Listener: in out TCP_Listener)
+                                 return TCP_Connection
+   with Inline is
+   begin
       return New_Connection: TCP_Connection do
          Listener.Dequeue (New_Connection);
       end return;
-   end Dequeue;
+   end Intermediate_Dequeue;
+   
+   
+   function Dequeue (Listener: in out TCP_Listener) return TCP_Connection'Class
+   is (Intermediate_Dequeue (Listener));
    
 end INET.TCP;
