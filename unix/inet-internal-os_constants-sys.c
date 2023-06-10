@@ -4,7 +4,7 @@
 **                                                                          **
 ** ************************************************************************ **
 **                                                                          **
-**  Copyright (C) 2020, ANNEXI-STRAYLINE Trans-Human Ltd.                   **
+**  Copyright (C) 2020-2023, ANNEXI-STRAYLINE Trans-Human Ltd.              **
 **  All rights reserved.                                                    **
 **                                                                          **
 **  Original Contributors:                                                  **
@@ -93,7 +93,7 @@ const int __inet_internal_os_constants_sys_IPPROTO_SCTP = IPPROTO_SCTP;
 
 /* Socket Types and Options */
 
-/* For MacOs, SOCK_NONBLOCK is not explicitly defined, and the socket(2)    */
+/* For MacOS, SOCK_NONBLOCK is not explicitly defined, and the socket(2)    */
 /* manpage also doesn't give any suggestion that flags can be used with the */
 /* type argument of socket(2)                                               */
 
@@ -101,6 +101,12 @@ const int __inet_internal_os_constants_sys_IPPROTO_SCTP = IPPROTO_SCTP;
 
 #ifndef SOCK_NONBLOCK
 # define SOCK_NONBLOCK O_NONBLOCK
+#endif
+
+/* Same is true for MacOS vis-a-vis SOCK_CLOEXEC, which is used             */
+
+#ifndef SOCK_CLOEXEC
+# define SOCK_CLOEXEC O_CLOEXEC
 #endif
 
 const int __inet_internal_os_constants_sys_SOCK_STREAM    = SOCK_STREAM;

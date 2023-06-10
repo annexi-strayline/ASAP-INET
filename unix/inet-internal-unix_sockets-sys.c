@@ -4,7 +4,7 @@
 **                                                                          **
 ** ************************************************************************ **
 **                                                                          **
-**  Copyright (C) 2020, ANNEXI-STRAYLINE Trans-Human Ltd.                   **
+**  Copyright (C) 2020-2023, ANNEXI-STRAYLINE Trans-Human Ltd.              **
 **  All rights reserved.                                                    **
 **                                                                          **
 **  Original Contributors:                                                  **
@@ -260,8 +260,8 @@ int __inet_internal_unix_sockets_sys_do_poll
                  /* Compute miliseconds timeout for poll(2) */
                  (no_timeout > 0 ? -1:
                   (int)
-                  (        (timeout->tv_sec  * 1000) +      /* 1000    ms/s  */
-                   (time_t)(timeout->tv_nsec / 1000000)))); /* 1000000 ns/ms */
+                  ((timeout->tv_sec  * 1000) +               /* 1000    ms/s  */
+                   (time_t)(timeout->tv_nsec / 1000000))))); /* 1000000 ns/ms */
 #else
      return (ppoll ( pfds, (nfds_t)fd_count,
                      (no_timeout > 0 ? NULL : timeout), NULL ));
