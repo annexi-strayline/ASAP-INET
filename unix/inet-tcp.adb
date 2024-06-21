@@ -183,6 +183,8 @@ package body INET.TCP is
       -- Select the appropriate polling procedure
       Poll: access procedure;
       
+      Did_One_Poll: Boolean := False;
+      
    begin
       if Item'Length = 0 then
          Last := Item'Last;
@@ -217,6 +219,15 @@ package body INET.TCP is
          
          if Status not in OK | Not_Ready then
             Raise_IO_Exception (Status, Errno);
+         elsif Last = Water_Level
+           and then Did_One_Poll
+         then
+            -- If a poll returned normally the poll therefore indicated that
+            -- data is available. If we then find the we receive nothing, this
+            -- is the BSD sockets way of saying the connection was closed,
+            -- or more correctly that we have reached the actual end of the
+            -- data (communication completed 'normally').
+            return;
          end if;
          
          if Last > Water_Level then
@@ -226,6 +237,8 @@ package body INET.TCP is
          -- We don't have enough and we didn't get an explicit error. Time to
          -- sleep on it
          Poll.all;
+         
+         Did_One_Poll := True;
          
       end loop;
    end Generic_Read;

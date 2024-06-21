@@ -83,10 +83,10 @@ package INET.TCP is
                    Last  :    out Stream_Element_Offset);
    -- Read attempts to read the entire Item buffer from the connection. If
    -- an error occurs, an exception is propegated any any partially read data
-   -- is lost. This was done to provide more useful error information during
-   -- stream reads, since simply "ending the stream" by setting Last to less
-   -- than Item'Last would not give an indication as to what happened, and in
-   -- most cases the read data would be lost anyways in such a case.
+   -- is lost. If the remote peer closes the connectio normally (shutdown),
+   -- this is not considered an "error", and Read will simply return with Last
+   -- < Item'Last. When using the stream interface, this would trigger an
+   -- End_Error exception from the RTL.
    
    procedure Read_Immediate (Stream: in out TCP_Connection;
                              Item  :    out Stream_Element_Array;
