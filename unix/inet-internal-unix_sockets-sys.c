@@ -4,7 +4,7 @@
 **                                                                          **
 ** ************************************************************************ **
 **                                                                          **
-**  Copyright (C) 2020-2023, ANNEXI-STRAYLINE Trans-Human Ltd.              **
+**  Copyright (C) 2020-2023, ANNEXI-STRAYLINE Inc.                          **
 **  All rights reserved.                                                    **
 **                                                                          **
 **  Original Contributors:                                                  **
