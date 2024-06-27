@@ -40,6 +40,8 @@
 --                                                                          --
 ------------------------------------------------------------------------------
 
+with Ada.Text_IO;
+
 with Ada.Calendar;
 with Ada.Exceptions;
 with Interfaces.C;
@@ -183,8 +185,6 @@ package body INET.TCP is
       -- Select the appropriate polling procedure
       Poll: access procedure;
       
-      Did_One_Poll: Boolean := False;
-      
    begin
       if Item'Length = 0 then
          Last := Item'Last;
@@ -213,33 +213,31 @@ package body INET.TCP is
             Status     => Status,
             Errno      => Errno);
          
-         exit when Last = Item'Last;
+         exit when Last = Item'Last
+           or else (Last = Water_Level and then Status = OK);
          -- If we got everything, even if there was an error, there's no real
-         -- reason to report it, thus this comes before we check status
+         -- reason to report it, thus this comes before we check status.
+         --
+         -- Otherwise if we received exactly no data and and Status is OK, that
+         -- means the remote peer shutdown their write end (our read-end), and
+         -- we have now received all the data there ever is going to be. In
+         -- either case we are done, and we leave the rest up to the caller
+         --
+         -- As an asside, any poll on the read-side of a shutdown socket will
+         -- return immediately indicating data is ready, so this set-up ensures
+         -- that we get all the remaining data before we return a short-handed
+         
+         -- If Status is Not_Ready, then Poll returned early because of some
+         -- legimitiate reason, such as a signal delivery or similar. In those
+         -- cases, we want to ensure that the Poll logic handles any actual
+         -- time exceedences.
          
          if Status not in OK | Not_Ready then
             Raise_IO_Exception (Status, Errno);
-         elsif Last = Water_Level
-           and then Did_One_Poll
-         then
-            -- If a poll returned normally the poll therefore indicated that
-            -- data is available. If we then find the we receive nothing, this
-            -- is the BSD sockets way of saying the connection was closed,
-            -- or more correctly that we have reached the actual end of the
-            -- data (communication completed 'normally').
-            return;
          end if;
          
-         if Last > Water_Level then
-            Water_Level := Last;
-         end if;
-         
-         -- We don't have enough and we didn't get an explicit error. Time to
-         -- sleep on it
+         Water_Level := Last;
          Poll.all;
-         
-         Did_One_Poll := True;
-         
       end loop;
    end Generic_Read;
    
